@@ -1,0 +1,211 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  pengguna
+  bengkel
+}
+
+enum JenisKendaraan {
+  motor
+  mobil
+}
+
+enum BookingStatus {
+  menunggu
+  dikonfirmasi
+  ditolak
+  dikerjakan
+  selesai
+  dibatalkan
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  role         Role
+  nama         String   @db.VarChar(100)
+  email        String   @unique @db.VarChar(150)
+  noHp         String   @unique @map("no_hp") @db.VarChar(20)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  vehicles      Vehicle[]
+  notifications Notification[]
+  bookings      Booking[]
+  workshop      Workshop?
+
+  @@map("users")
+}
+
+model Vehicle {
+  id               Int            @id @default(autoincrement())
+  userId           Int            @map("user_id")
+  jenis            JenisKendaraan
+  merekTipe        String         @map("merek_tipe") @db.VarChar(100)
+  platNomor        String         @map("plat_nomor") @db.VarChar(15)
+  tahun            Int
+  odometerTerakhir Int            @default(0) @map("odometer_terakhir")
+  isUtama          Boolean        @default(false) @map("is_utama")
+  createdAt        DateTime       @default(now()) @map("created_at")
+
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  odometerLogs      OdometerLog[]
+  serviceRecords    ServiceRecord[]
+  vehicleComponents VehicleComponent[]
+  bookings          Booking[]
+  notifications     Notification[]
+
+  @@unique([userId, platNomor])
+  @@map("vehicles")
+}
+
+model OdometerLog {
+  id          Int      @id @default(autoincrement())
+  vehicleId   Int      @map("vehicle_id")
+  km          Int
+  dicatatPada DateTime @default(now()) @map("dicatat_pada")
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("odometer_logs")
+}
+
+model ServiceRecord {
+  id          Int      @id @default(autoincrement())
+  vehicleId   Int      @map("vehicle_id")
+  bookingId   Int?     @unique @map("booking_id")
+  tanggal     DateTime @db.Date
+  odometer    Int
+  jenisServis String   @map("jenis_servis") @db.VarChar(200)
+  namaBengkel String   @map("nama_bengkel") @db.VarChar(150)
+  biaya       Int      @default(0)
+  catatan     String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  vehicle Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@map("service_records")
+}
+
+model ServiceComponent {
+  id             Int            @id @default(autoincrement())
+  nama           String         @db.VarChar(100)
+  intervalKm     Int            @map("interval_km")
+  intervalBulan  Int            @map("interval_bulan")
+  jenisKendaraan JenisKendaraan @map("jenis_kendaraan")
+
+  vehicleComponents VehicleComponent[]
+
+  @@unique([nama, jenisKendaraan])
+  @@map("service_components")
+}
+
+model VehicleComponent {
+  id              Int       @id @default(autoincrement())
+  vehicleId       Int       @map("vehicle_id")
+  componentId     Int       @map("component_id")
+  lastServiceKm   Int       @default(0) @map("last_service_km")
+  lastServiceDate DateTime? @map("last_service_date") @db.Date
+
+  vehicle   Vehicle          @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  component ServiceComponent @relation(fields: [componentId], references: [id], onDelete: Cascade)
+
+  @@unique([vehicleId, componentId])
+  @@map("vehicle_components")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  vehicleId Int?     @map("vehicle_id")
+  tipe      String   @db.VarChar(30)
+  judul     String   @db.VarChar(150)
+  isi       String   @db.Text
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  @@map("notifications")
+}
+
+model Workshop {
+  id              Int     @id @default(autoincrement())
+  userId          Int     @unique @map("user_id")
+  nama            String  @db.VarChar(150)
+  spesialis       String? @db.VarChar(150)
+  kota            String? @db.VarChar(100)
+  alamat          String? @db.Text
+  noWhatsapp      String? @map("no_whatsapp") @db.VarChar(20)
+  jamBuka         String  @default("08:00") @map("jam_buka") @db.VarChar(5)
+  jamTutup        String  @default("17:00") @map("jam_tutup") @db.VarChar(5)
+  hariOperasional String  @default("Senin - Sabtu") @map("hari_operasional") @db.VarChar(60)
+  kuotaHarian     Int     @default(10) @map("kuota_harian")
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  services WorkshopService[]
+  bookings Booking[]
+
+  @@map("workshops")
+}
+
+model WorkshopService {
+  id          Int     @id @default(autoincrement())
+  workshopId  Int     @map("workshop_id")
+  kategori    String  @db.VarChar(60)
+  nama        String  @db.VarChar(150)
+  deskripsi   String? @db.VarChar(255)
+  durasiMenit Int     @default(30) @map("durasi_menit")
+  hargaMin    Int     @map("harga_min")
+  hargaMax    Int     @map("harga_max")
+  isActive    Boolean @default(true) @map("is_active")
+
+  workshop        Workshop         @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  bookingServices BookingService[]
+
+  @@map("workshop_services")
+}
+
+model Booking {
+  id              Int           @id @default(autoincrement())
+  userId          Int           @map("user_id")
+  vehicleId       Int           @map("vehicle_id")
+  workshopId      Int           @map("workshop_id")
+  tanggal         DateTime      @db.Date
+  jam             String        @db.VarChar(5)
+  keluhan         String?       @db.Text
+  status          BookingStatus @default(menunggu)
+  alasanPenolakan String?       @map("alasan_penolakan") @db.VarChar(255)
+  biayaAkhir      Int?          @map("biaya_akhir")
+  catatanBengkel  String?       @map("catatan_bengkel") @db.Text
+  mekanik         String?       @db.VarChar(100)
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicle       Vehicle          @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  workshop      Workshop         @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  services      BookingService[]
+  serviceRecord ServiceRecord?
+
+  @@map("bookings")
+}
+
+model BookingService {
+  id                Int @id @default(autoincrement())
+  bookingId         Int @map("booking_id")
+  workshopServiceId Int @map("workshop_service_id")
+  harga             Int
+
+  booking         Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  workshopService WorkshopService @relation(fields: [workshopServiceId], references: [id])
+
+  @@map("booking_services")
+}
