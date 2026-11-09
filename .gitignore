@@ -48,3 +48,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+node_modules/
+.env
+servisku-api/.env
