@@ -3,6 +3,7 @@ const auth = require('../middleware/auth');
 const authorizeRole = require('../middleware/role');
 
 router.use('/auth', require('./authRoutes'));
+router.use('/vehicles', require('./vehicleRoutes'));
 
 // Rute contoh untuk menguji pembatasan role (hapus saat fitur asli sudah ada)
 router.get('/test/pengguna', auth, authorizeRole('pengguna'), (req, res) =>
