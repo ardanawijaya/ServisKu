@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/service_provider.dart';
 import '../../../providers/vehicle_provider.dart';
 import '../../../widgets/app_header.dart';
 import '../../../widgets/initials_avatar.dart';
@@ -14,6 +15,7 @@ class ProfilPenggunaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user;
     final jumlahKendaraan = context.watch<VehicleProvider>().items.length;
+    final jumlahServis = context.watch<ServiceProvider>().items.length;
     if (user == null) return const SizedBox.shrink();
 
     return Scaffold(
@@ -50,22 +52,8 @@ class ProfilPenggunaScreen extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: Column(
-                          children: [
-                            Text('$jumlahKendaraan',
-                                style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.primary)),
-                            const Text('KENDARAAN',
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.muted)),
-                          ],
-                        ),
-                      ),
+                      _Stat(value: '$jumlahKendaraan', label: 'KENDARAAN'),
+                      _Stat(value: '$jumlahServis', label: 'CATATAN SERVIS'),
                     ],
                   ),
                 ),
@@ -78,8 +66,10 @@ class ProfilPenggunaScreen extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: () async {
                 final vp = context.read<VehicleProvider>();
+                final sp = context.read<ServiceProvider>();
                 await context.read<AuthProvider>().logout();
                 vp.clear();
+                sp.clear();
                 if (context.mounted) context.go('/onboarding');
               },
               icon: const Icon(Icons.logout, size: 18),
@@ -92,6 +82,28 @@ class ProfilPenggunaScreen extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Stat extends StatelessWidget {
+  const _Stat({required this.value, required this.label});
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(value,
+              style: const TextStyle(
+                  fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primary)),
+          Text(label,
+              style: const TextStyle(
+                  fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.muted)),
         ],
       ),
     );

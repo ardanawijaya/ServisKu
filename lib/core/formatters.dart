@@ -9,6 +9,9 @@ String formatKm(int n) {
   return buf.toString();
 }
 
+/// 1485000 -> "Rp 1.485.000"
+String formatRupiah(int n) => 'Rp ${formatKm(n)}';
+
 const _bulan = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',

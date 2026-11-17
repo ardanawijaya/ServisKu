@@ -9,6 +9,7 @@ import '../features/pengguna/coming_soon_screen.dart';
 import '../features/pengguna/kendaraan/kendaraan_screen.dart';
 import '../features/pengguna/pengguna_shell.dart';
 import '../features/pengguna/profil/profil_pengguna_screen.dart';
+import '../features/pengguna/servis/servis_screen.dart';
 import '../features/splash/splash_screen.dart';
 import '../providers/auth_provider.dart';
 
@@ -53,8 +54,7 @@ GoRouter createRouter(AuthProvider auth) {
           StatefulShellBranch(routes: [
             GoRoute(
                 path: '/home/pengguna/servis',
-                builder: (c, s) => const ComingSoonScreen(
-                    title: 'Catatan Servis', icon: Icons.build_rounded)),
+                builder: (c, s) => const ServisScreen()),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(

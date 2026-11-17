@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/router.dart';
 import 'core/theme.dart';
 import 'providers/auth_provider.dart';
+import 'providers/service_provider.dart';
 import 'providers/vehicle_provider.dart';
 
 void main() {
@@ -15,6 +16,7 @@ void main() {
       providers: [
         ChangeNotifierProvider<AuthProvider>.value(value: auth),
         ChangeNotifierProvider<VehicleProvider>(create: (_) => VehicleProvider()),
+        ChangeNotifierProvider<ServiceProvider>(create: (_) => ServiceProvider()),
       ],
       child: ServisKuApp(router: router),
     ),

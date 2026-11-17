@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants.dart';
-import '../../../providers/vehicle_provider.dart';
+import '../../core/constants.dart';
+import '../../providers/service_provider.dart';
+import '../../providers/vehicle_provider.dart';
 
 /// Kerangka halaman pengguna: konten tab + bottom navigation.
 class PenggunaShell extends StatefulWidget {
@@ -17,9 +18,11 @@ class _PenggunaShellState extends State<PenggunaShell> {
   @override
   void initState() {
     super.initState();
-    // Muat data kendaraan sekali saat pengguna masuk
+    // Muat data kendaraan dan catatan servis sekali saat pengguna masuk
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.read<VehicleProvider>().load();
+      if (!mounted) return;
+      context.read<VehicleProvider>().load();
+      context.read<ServiceProvider>().load();
     });
   }
 
