@@ -7,6 +7,7 @@ import 'providers/auth_provider.dart';
 import 'providers/notification_provider.dart';
 import 'providers/service_provider.dart';
 import 'providers/vehicle_provider.dart';
+import 'providers/workshop_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,7 @@ void main() {
   final vehicles =
       VehicleProvider(onDataChanged: () => notifications.load(silent: true));
   final services = ServiceProvider();
+  final workshop = WorkshopProvider();
   final router = createRouter(auth);
 
   runApp(
@@ -25,6 +27,7 @@ void main() {
         ChangeNotifierProvider<VehicleProvider>.value(value: vehicles),
         ChangeNotifierProvider<ServiceProvider>.value(value: services),
         ChangeNotifierProvider<NotificationProvider>.value(value: notifications),
+        ChangeNotifierProvider<WorkshopProvider>.value(value: workshop),
       ],
       child: ServisKuApp(router: router),
     ),

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
+import '../features/bengkel/bengkel_shell.dart';
+import '../features/bengkel/layanan_screen.dart';
+import '../features/bengkel/profil_bengkel_screen.dart';
 import '../features/home/home_bengkel_screen.dart';
 import '../features/home/home_pengguna_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
@@ -26,9 +29,16 @@ GoRouter createRouter(AuthProvider auth) {
     refreshListenable: auth,
     redirect: (context, state) {
       final loc = state.matchedLocation;
-      // Halaman di dalam aplikasi hanya untuk yang sudah login
       final terproteksi = loc.startsWith('/home') || loc == '/notifikasi';
-      if (!auth.isLoggedIn && terproteksi) return '/onboarding';
+
+      // Belum login -> tidak boleh membuka halaman di dalam aplikasi
+      if (!auth.isLoggedIn) return terproteksi ? '/onboarding' : null;
+
+      // Sudah login -> hanya boleh membuka area sesuai rolenya
+      final role = auth.user!.role;
+      if (loc.startsWith('/home/bengkel') && role != 'bengkel') return '/home/pengguna';
+      if (loc.startsWith('/home/pengguna') && role != 'pengguna') return '/home/bengkel';
+      if (loc == '/notifikasi' && role != 'pengguna') return '/home/bengkel';
       return null;
     },
     routes: [
@@ -75,8 +85,27 @@ GoRouter createRouter(AuthProvider auth) {
         ],
       ),
 
-      GoRoute(
-          path: '/home/bengkel', builder: (c, s) => const HomeBengkelScreen()),
+      // Area bengkel: 3 tab (Home, Layanan, Profil)
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, shell) => BengkelShell(navigationShell: shell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(
+                path: '/home/bengkel',
+                builder: (c, s) => const HomeBengkelScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+                path: '/home/bengkel/layanan',
+                builder: (c, s) => const LayananScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+                path: '/home/bengkel/profil',
+                builder: (c, s) => const ProfilBengkelScreen()),
+          ]),
+        ],
+      ),
     ],
   );
 }

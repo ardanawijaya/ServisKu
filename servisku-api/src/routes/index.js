@@ -6,6 +6,7 @@ router.use('/auth', require('./authRoutes'));
 router.use('/vehicles', require('./vehicleRoutes'));
 router.use('/services', require('./serviceRoutes'));
 router.use('/notifications', require('./notificationRoutes'));
+router.use('/workshop', require('./workshopRoutes'));
 
 // Rute contoh untuk menguji pembatasan role (hapus saat fitur asli sudah ada)
 router.get('/test/pengguna', auth, authorizeRole('pengguna'), (req, res) =>
