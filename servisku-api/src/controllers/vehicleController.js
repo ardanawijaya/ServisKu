@@ -1,5 +1,6 @@
 const { z } = require('zod');
 const prisma = require('../config/db');
+const { pengingatUntukKendaraan } = require('../utils/pengingatService');
 
 // ---------- Validasi ----------
 const plat = z
@@ -47,7 +48,7 @@ const include = {
   serviceRecords: { orderBy: { tanggal: 'desc' }, take: 1, select: { tanggal: true } },
 };
 
-function format(v) {
+function format(v, pengingat = null) {
   return {
     id: v.id,
     jenis: v.jenis,
@@ -57,6 +58,7 @@ function format(v) {
     odometerTerakhir: v.odometerTerakhir,
     isUtama: v.isUtama,
     servisTerakhir: v.serviceRecords?.[0]?.tanggal ?? null,
+    pengingat,
   };
 }
 
@@ -116,7 +118,11 @@ exports.list = async (req, res, next) => {
       ringkasan.semua += g._count._all;
     }
 
-    res.json({ success: true, data: { vehicles: rows.map(format), ringkasan } });
+    const peng = await pengingatUntukKendaraan(rows);
+    res.json({
+      success: true,
+      data: { vehicles: rows.map((v) => format(v, peng[v.id])), ringkasan },
+    });
   } catch (err) {
     next(err);
   }
@@ -127,7 +133,20 @@ exports.detail = async (req, res, next) => {
     const id = getId(req);
     await findOwned(id, req.user.id);
     const v = await prisma.vehicle.findUnique({ where: { id }, include });
-    res.json({ success: true, data: { vehicle: format(v) } });
+    const peng = await pengingatUntukKendaraan([v]);
+    res.json({ success: true, data: { vehicle: format(v, peng[v.id]) } });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Detail pengingat servis satu kendaraan (status tiap komponen, estimasi, kondisi)
+exports.pengingat = async (req, res, next) => {
+  try {
+    const id = getId(req);
+    const v = await findOwned(id, req.user.id);
+    const peng = await pengingatUntukKendaraan([v]);
+    res.json({ success: true, data: { pengingat: peng[v.id] } });
   } catch (err) {
     next(err);
   }

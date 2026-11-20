@@ -6,6 +6,7 @@ import '../../../data/api_client.dart';
 import '../../../data/models/vehicle_model.dart';
 import '../../../providers/vehicle_provider.dart';
 import '../../../widgets/app_header.dart';
+import '../../../widgets/pengingat_widgets.dart';
 import 'odometer_sheet.dart';
 import 'vehicle_form_sheet.dart';
 
@@ -284,6 +285,7 @@ class _VehicleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final v = vehicle;
+    final p = v.pengingat;
     final accent = v.isMotor ? AppColors.primary : AppColors.orange;
     final soft = v.isMotor ? AppColors.blueSoft : AppColors.orangeSoft;
 
@@ -340,17 +342,26 @@ class _VehicleCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.bg,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(v.platNomor,
-                          style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5)),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Container(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.bg,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(v.platNomor,
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5)),
+                        ),
+                        if (p != null) KondisiBadge(pengingat: p),
+                      ],
                     ),
                   ],
                 ),
@@ -396,6 +407,10 @@ class _VehicleCard extends StatelessWidget {
               ],
             ),
           ),
+          if (p != null) ...[
+            const SizedBox(height: 12),
+            SiklusBar(pengingat: p),
+          ],
           const SizedBox(height: 10),
           Row(
             children: [

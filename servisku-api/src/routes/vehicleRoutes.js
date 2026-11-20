@@ -9,6 +9,7 @@ router.use(auth, authorizeRole('pengguna'));
 router.get('/', c.list);
 router.post('/', c.create);
 router.get('/:id', c.detail);
+router.get('/:id/pengingat', c.pengingat);
 router.put('/:id', c.update);
 router.delete('/:id', c.remove);
 router.patch('/:id/odometer', c.updateOdometer);

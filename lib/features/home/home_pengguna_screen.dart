@@ -7,6 +7,7 @@ import '../../data/api_client.dart';
 import '../../data/models/vehicle_model.dart';
 import '../../providers/vehicle_provider.dart';
 import '../../widgets/app_header.dart';
+import '../../widgets/pengingat_widgets.dart';
 import '../pengguna/kendaraan/vehicle_form_sheet.dart';
 
 class HomePenggunaScreen extends StatefulWidget {
@@ -72,6 +73,7 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
             vp.error != null ? vp.load() : VehicleFormSheet.show(context),
       );
     } else {
+      final p = v.pengingat;
       body = ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -109,6 +111,7 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
             ),
           ),
           const SizedBox(height: 14),
+
           // Kartu kendaraan + update odometer
           Container(
             padding: const EdgeInsets.all(16),
@@ -154,6 +157,10 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
                         ],
                       ),
                     ),
+                    if (p != null) ...[
+                      const SizedBox(width: 8),
+                      KondisiBadge(pengingat: p),
+                    ],
                   ],
                 ),
                 const Divider(height: 28),
@@ -219,27 +226,23 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.blueSoft,
-              borderRadius: BorderRadius.circular(16),
+
+          if (p != null) ...[
+            EstimasiCard(pengingat: p),
+            const SizedBox(height: 18),
+            StatusKomponenSection(pengingat: p),
+          ] else
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.blueSoft,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Text(
+                'Data pengingat belum tersedia untuk kendaraan ini. Pastikan data master komponen sudah di-seed di backend.',
+                style: TextStyle(fontSize: 12, color: AppColors.primary, height: 1.5),
+              ),
             ),
-            child: const Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.info_outline, size: 18, color: AppColors.primary),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Estimasi servis berikutnya dan status komponen (aman, mendekati jadwal, terlambat) akan tampil di sini setelah fitur pengingat selesai.',
-                    style: TextStyle(
-                        fontSize: 12, color: AppColors.primary, height: 1.5),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       );
     }

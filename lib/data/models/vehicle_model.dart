@@ -1,3 +1,5 @@
+import 'pengingat_model.dart';
+
 class VehicleModel {
   final int id;
   final String jenis; // 'motor' | 'mobil'
@@ -7,6 +9,7 @@ class VehicleModel {
   final int odometerTerakhir;
   final bool isUtama;
   final DateTime? servisTerakhir;
+  final PengingatModel? pengingat;
 
   const VehicleModel({
     required this.id,
@@ -17,6 +20,7 @@ class VehicleModel {
     required this.odometerTerakhir,
     required this.isUtama,
     this.servisTerakhir,
+    this.pengingat,
   });
 
   bool get isMotor => jenis == 'motor';
@@ -32,5 +36,8 @@ class VehicleModel {
         servisTerakhir: j['servisTerakhir'] == null
             ? null
             : DateTime.parse(j['servisTerakhir'] as String),
+        pengingat: j['pengingat'] == null
+            ? null
+            : PengingatModel.fromJson(j['pengingat'] as Map<String, dynamic>),
       );
 }
