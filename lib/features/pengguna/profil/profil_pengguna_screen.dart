@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/notification_provider.dart';
 import '../../../providers/service_provider.dart';
 import '../../../providers/vehicle_provider.dart';
 import '../../../widgets/app_header.dart';
@@ -67,9 +68,11 @@ class ProfilPenggunaScreen extends StatelessWidget {
               onPressed: () async {
                 final vp = context.read<VehicleProvider>();
                 final sp = context.read<ServiceProvider>();
+                final np = context.read<NotificationProvider>();
                 await context.read<AuthProvider>().logout();
                 vp.clear();
                 sp.clear();
+                np.clear();
                 if (context.mounted) context.go('/onboarding');
               },
               icon: const Icon(Icons.logout, size: 18),

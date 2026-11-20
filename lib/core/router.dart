@@ -7,6 +7,7 @@ import '../features/home/home_pengguna_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/pengguna/coming_soon_screen.dart';
 import '../features/pengguna/kendaraan/kendaraan_screen.dart';
+import '../features/pengguna/notifikasi/notifikasi_screen.dart';
 import '../features/pengguna/pengguna_shell.dart';
 import '../features/pengguna/profil/profil_pengguna_screen.dart';
 import '../features/pengguna/servis/servis_screen.dart';
@@ -25,8 +26,9 @@ GoRouter createRouter(AuthProvider auth) {
     refreshListenable: auth,
     redirect: (context, state) {
       final loc = state.matchedLocation;
-      // Halaman home hanya untuk yang sudah login
-      if (!auth.isLoggedIn && loc.startsWith('/home')) return '/onboarding';
+      // Halaman di dalam aplikasi hanya untuk yang sudah login
+      final terproteksi = loc.startsWith('/home') || loc == '/notifikasi';
+      if (!auth.isLoggedIn && terproteksi) return '/onboarding';
       return null;
     },
     routes: [
@@ -36,6 +38,8 @@ GoRouter createRouter(AuthProvider auth) {
       GoRoute(
           path: '/register',
           builder: (c, s) => RegisterScreen(role: _roleOf(s))),
+      GoRoute(
+          path: '/notifikasi', builder: (c, s) => const NotifikasiScreen()),
 
       // Area pengguna: 5 tab dengan bottom navigation
       StatefulShellRoute.indexedStack(

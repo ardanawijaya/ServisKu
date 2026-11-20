@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants.dart';
+import '../../providers/notification_provider.dart';
 import '../../providers/service_provider.dart';
 import '../../providers/vehicle_provider.dart';
 
@@ -18,11 +19,12 @@ class _PenggunaShellState extends State<PenggunaShell> {
   @override
   void initState() {
     super.initState();
-    // Muat data kendaraan dan catatan servis sekali saat pengguna masuk
+    // Muat data awal sekali saat pengguna masuk
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<VehicleProvider>().load();
       context.read<ServiceProvider>().load();
+      context.read<NotificationProvider>().load();
     });
   }
 

@@ -4,6 +4,12 @@ import '../data/models/vehicle_model.dart';
 import '../data/vehicle_repository.dart';
 
 class VehicleProvider extends ChangeNotifier {
+  VehicleProvider({this.onDataChanged});
+
+  /// Dipanggil setelah data kendaraan berubah (tambah, ubah, hapus, update odometer, servis).
+  /// Dipakai untuk menyegarkan notifikasi.
+  final VoidCallback? onDataChanged;
+
   final _repo = VehicleRepository();
 
   List<VehicleModel> _items = [];
@@ -52,6 +58,8 @@ class VehicleProvider extends ChangeNotifier {
     }
     _loading = false;
     notifyListeners();
+    // load(silent: true) dipakai setelah ada perubahan data -> segarkan notifikasi
+    if (silent) onDataChanged?.call();
   }
 
   Future<void> add({

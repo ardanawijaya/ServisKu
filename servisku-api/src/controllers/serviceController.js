@@ -2,6 +2,7 @@ const { z } = require('zod');
 const prisma = require('../config/db');
 const { JENIS_SERVIS, parseJenis } = require('../utils/serviceTypes');
 const { syncOdometer, recomputeComponents } = require('../utils/componentSync');
+const { notifikasiServisTersimpan } = require('../utils/notifikasi');
 
 // ---------- Validasi ----------
 const toDate = (s) => new Date(`${s}T00:00:00.000Z`);
@@ -137,6 +138,11 @@ exports.create = async (req, res, next) => {
       await recomputeComponents(tx, vehicle.id);
       return r;
     });
+
+    // Notifikasi tidak boleh menggagalkan penyimpanan catatan servis
+    await notifikasiServisTersimpan(userId, vehicle, created).catch((e) =>
+      console.error('Gagal membuat notifikasi servis:', e),
+    );
 
     const full = await prisma.serviceRecord.findUnique({ where: { id: created.id }, include });
     res.status(201).json({
