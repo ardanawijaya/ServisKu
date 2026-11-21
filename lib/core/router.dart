@@ -8,7 +8,7 @@ import '../features/bengkel/profil_bengkel_screen.dart';
 import '../features/home/home_bengkel_screen.dart';
 import '../features/home/home_pengguna_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
-import '../features/pengguna/coming_soon_screen.dart';
+import '../features/pengguna/booking/booking_screen.dart';
 import '../features/pengguna/kendaraan/kendaraan_screen.dart';
 import '../features/pengguna/notifikasi/notifikasi_screen.dart';
 import '../features/pengguna/pengguna_shell.dart';
@@ -73,9 +73,7 @@ GoRouter createRouter(AuthProvider auth) {
           StatefulShellBranch(routes: [
             GoRoute(
                 path: '/home/pengguna/booking',
-                builder: (c, s) => const ComingSoonScreen(
-                    title: 'Booking Servis',
-                    icon: Icons.format_list_bulleted_rounded)),
+                builder: (c, s) => const BookingScreen()),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(

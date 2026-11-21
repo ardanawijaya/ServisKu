@@ -7,9 +7,13 @@ import '../data/token_storage.dart';
 class AuthProvider extends ChangeNotifier {
   final _repo = AuthRepository();
   UserModel? _user;
+  final List<VoidCallback> _logoutListeners = [];
 
   UserModel? get user => _user;
   bool get isLoggedIn => _user != null;
+
+  /// Daftarkan fungsi yang dipanggil saat logout (mis. membersihkan data provider lain).
+  void addLogoutListener(VoidCallback listener) => _logoutListeners.add(listener);
 
   /// Dipanggil saat splash: cek token tersimpan, validasi ke server.
   Future<void> init() async {
@@ -50,6 +54,9 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     await TokenStorage.clear();
     _user = null;
+    for (final l in _logoutListeners) {
+      l();
+    }
     notifyListeners();
   }
 }
