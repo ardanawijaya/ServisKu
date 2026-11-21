@@ -43,4 +43,23 @@ class AuthRepository {
       throw ApiClient.parseError(e);
     }
   }
+
+  Future<UserModel> updateProfile(Map<String, dynamic> body) async {
+    try {
+      final res = await _dio.put('/auth/profile', data: body);
+      return UserModel.fromJson(
+          res.data['data']['user'] as Map<String, dynamic>);
+    } catch (e) {
+      throw ApiClient.parseError(e);
+    }
+  }
+
+  Future<void> changePassword(String lama, String baru) async {
+    try {
+      await _dio.put('/auth/password',
+          data: {'passwordLama': lama, 'passwordBaru': baru});
+    } catch (e) {
+      throw ApiClient.parseError(e);
+    }
+  }
 }

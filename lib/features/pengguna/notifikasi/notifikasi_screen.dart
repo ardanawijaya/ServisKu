@@ -15,6 +15,12 @@ class NotifikasiScreen extends StatefulWidget {
   State<NotifikasiScreen> createState() => _NotifikasiScreenState();
 }
 
+class _AksiNotif {
+  const _AksiNotif(this.label, this.onTap);
+  final String label;
+  final VoidCallback onTap;
+}
+
 class _NotifikasiScreenState extends State<NotifikasiScreen> {
   String _filter = 'semua'; // semua | perawatan | pengingat
 
@@ -36,16 +42,39 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
       case 'servis':
         return const StatusStyle(Color(0xFF15803D), Color(0xFFDCFCE7), Color(0xFF86EFAC),
             'Selesai', Icons.receipt_long_outlined);
+      case 'booking':
+        return const StatusStyle(Color(0xFF7C3AED), Color(0xFFEDE9FE), Color(0xFFC4B5FD),
+            'Booking', Icons.event_available_outlined);
       default:
         return const StatusStyle(AppColors.primary, AppColors.blueSoft, Color(0xFFBFDBFE),
             'Pengingat KM', Icons.speed_rounded);
     }
   }
 
-  void _bukaHome(NotificationModel n) {
+  void _ke(NotificationModel n, String path, {bool pilihKendaraan = false}) {
     context.read<NotificationProvider>().markRead(n.id);
-    if (n.vehicleId != null) context.read<VehicleProvider>().select(n.vehicleId!);
-    context.go('/home/pengguna');
+    if (pilihKendaraan && n.vehicleId != null) {
+      context.read<VehicleProvider>().select(n.vehicleId!);
+    }
+    context.go(path);
+  }
+
+  _AksiNotif? _aksi(NotificationModel n) {
+    switch (n.tipe) {
+      case 'pengingat_km':
+        return _AksiNotif('Update Odometer \u2192',
+            () => _ke(n, '/home/pengguna', pilihKendaraan: true));
+      case 'mendekati':
+      case 'terlambat':
+        // Integrasi pengingat -> booking
+        return _AksiNotif('Booking Sekarang \u2192',
+            () => _ke(n, '/home/pengguna/booking', pilihKendaraan: true));
+      case 'booking':
+        return _AksiNotif('Lihat Booking \u2192', () => _ke(n, '/home/pengguna/booking'));
+      case 'servis':
+        return _AksiNotif('Lihat Riwayat \u2192', () => _ke(n, '/home/pengguna/servis'));
+    }
+    return null;
   }
 
   List<Widget> _section(String judul, List<NotificationModel> data) {
@@ -62,7 +91,7 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
           n: n,
           gaya: _gaya(n.tipe),
           onTap: () => context.read<NotificationProvider>().markRead(n.id),
-          onAksi: n.tipe == 'pengingat_km' ? () => _bukaHome(n) : null,
+          aksi: _aksi(n),
         ),
         const SizedBox(height: 10),
       ],
@@ -258,13 +287,13 @@ class _NotifCard extends StatelessWidget {
     required this.n,
     required this.gaya,
     required this.onTap,
-    this.onAksi,
+    this.aksi,
   });
 
   final NotificationModel n;
   final StatusStyle gaya;
   final VoidCallback onTap;
-  final VoidCallback? onAksi;
+  final _AksiNotif? aksi;
 
   @override
   Widget build(BuildContext context) {
@@ -339,11 +368,11 @@ class _NotifCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      if (onAksi != null)
+                      if (aksi != null)
                         InkWell(
-                          onTap: onAksi,
-                          child: const Text('Update Odometer \u2192',
-                              style: TextStyle(
+                          onTap: aksi!.onTap,
+                          child: Text(aksi!.label,
+                              style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.primary)),

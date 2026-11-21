@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../core/constants.dart';
 import '../../core/formatters.dart';
 import '../../data/api_client.dart';
@@ -35,8 +37,10 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
       return;
     }
     if (km <= v.odometerTerakhir) {
-      setState(() => _error =
-          'Odometer baru harus lebih besar dari ${formatKm(v.odometerTerakhir)} km');
+      setState(
+        () => _error =
+            'Odometer baru harus lebih besar dari ${formatKm(v.odometerTerakhir)} km',
+      );
       return;
     }
     setState(() {
@@ -49,7 +53,10 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
       final selisih = await vp.updateOdometer(v.id, km);
       _km.clear();
       messenger.showSnackBar(
-          SnackBar(content: Text('Odometer diperbarui (+${formatKm(selisih)} km)')));
+        SnackBar(
+          content: Text('Odometer diperbarui (+${formatKm(selisih)} km)'),
+        ),
+      );
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);
     } finally {
@@ -67,7 +74,8 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
       body = const Center(child: CircularProgressIndicator());
     } else if (v == null) {
       body = _EmptyState(
-        message: vp.error ?? 'Belum ada kendaraan. Tambahkan kendaraan pertamamu.',
+        message:
+            vp.error ?? 'Belum ada kendaraan. Tambahkan kendaraan pertamamu.',
         isError: vp.error != null,
         onAction: () =>
             vp.error != null ? vp.load() : VehicleFormSheet.show(context),
@@ -90,19 +98,31 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
                       setState(() => _error = null);
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 9,
+                      ),
                       decoration: BoxDecoration(
-                        color: item.id == v.id ? AppColors.primary : Colors.white,
+                        color: item.id == v.id
+                            ? AppColors.primary
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                            color:
-                                item.id == v.id ? AppColors.primary : AppColors.border),
+                          color: item.id == v.id
+                              ? AppColors.primary
+                              : AppColors.border,
+                        ),
                       ),
-                      child: Text(item.merekTipe,
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: item.id == v.id ? Colors.white : AppColors.muted)),
+                      child: Text(
+                        item.merekTipe,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: item.id == v.id
+                              ? Colors.white
+                              : AppColors.muted,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -128,7 +148,9 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: v.isMotor ? AppColors.blueSoft : AppColors.orangeSoft,
+                        color: v.isMotor
+                            ? AppColors.blueSoft
+                            : AppColors.orangeSoft,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -143,16 +165,22 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(v.merekTipe,
-                              style: const TextStyle(
-                                  fontSize: 17, fontWeight: FontWeight.w800)),
+                          Text(
+                            v.merekTipe,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                           const SizedBox(height: 2),
                           Text(
                             v.servisTerakhir == null
                                 ? '${v.platNomor} | Belum ada catatan servis'
                                 : '${v.platNomor} | Terakhir Servis : ${formatTanggal(v.servisTerakhir!)}',
                             style: const TextStyle(
-                                fontSize: 11, color: AppColors.muted),
+                              fontSize: 11,
+                              color: AppColors.muted,
+                            ),
                           ),
                         ],
                       ),
@@ -164,24 +192,34 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
                   ],
                 ),
                 const Divider(height: 28),
-                const Text('Jarak Tempuh Terakhir',
-                    style: TextStyle(fontSize: 12, color: AppColors.muted)),
+                const Text(
+                  'Jarak Tempuh Terakhir',
+                  style: TextStyle(fontSize: 12, color: AppColors.muted),
+                ),
                 const SizedBox(height: 4),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Text(formatKm(v.odometerTerakhir),
-                        style: const TextStyle(
-                            fontSize: 36, fontWeight: FontWeight.w800)),
+                    Text(
+                      formatKm(v.odometerTerakhir),
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                     const SizedBox(width: 6),
-                    const Text('km',
-                        style: TextStyle(fontSize: 14, color: AppColors.muted)),
+                    const Text(
+                      'km',
+                      style: TextStyle(fontSize: 14, color: AppColors.muted),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
-                const Text('Input KM Baru',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                const Text(
+                  'Input KM Baru',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                ),
                 const SizedBox(height: 6),
                 TextField(
                   controller: _km,
@@ -195,8 +233,13 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 8),
-                  Text(_error!,
-                      style: const TextStyle(color: AppColors.danger, fontSize: 12)),
+                  Text(
+                    _error!,
+                    style: const TextStyle(
+                      color: AppColors.danger,
+                      fontSize: 12,
+                    ),
+                  ),
                 ],
                 const SizedBox(height: 12),
                 SizedBox(
@@ -217,7 +260,8 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
                       foregroundColor: const Color(0xFFB45309),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                       textStyle: const TextStyle(fontWeight: FontWeight.w800),
                     ),
                   ),
@@ -229,6 +273,27 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
 
           if (p != null) ...[
             EstimasiCard(pengingat: p),
+            if (p.estimasi.status != 'aman') ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.go('/home/pengguna/booking'),
+                  icon: const Icon(Icons.event_available_outlined, size: 18),
+                  label: const Text('Booking Servis Sekarang'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    textStyle: const TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 18),
             StatusKomponenSection(pengingat: p),
           ] else
@@ -240,7 +305,11 @@ class _HomePenggunaScreenState extends State<HomePenggunaScreen> {
               ),
               child: const Text(
                 'Data pengingat belum tersedia untuk kendaraan ini. Pastikan data master komponen sudah di-seed di backend.',
-                style: TextStyle(fontSize: 12, color: AppColors.primary, height: 1.5),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.primary,
+                  height: 1.5,
+                ),
               ),
             ),
         ],
@@ -273,12 +342,17 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(isError ? Icons.cloud_off_outlined : Icons.two_wheeler_outlined,
-                size: 48, color: AppColors.muted),
+            Icon(
+              isError ? Icons.cloud_off_outlined : Icons.two_wheeler_outlined,
+              size: 48,
+              color: AppColors.muted,
+            ),
             const SizedBox(height: 12),
-            Text(message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.muted, fontSize: 13)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.muted, fontSize: 13),
+            ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: onAction,

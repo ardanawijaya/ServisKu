@@ -6,6 +6,7 @@ import '../../core/text_utils.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/workshop_provider.dart';
 import '../../widgets/bengkel_header.dart';
+import '../akun/akun_sheets.dart';
 import 'bengkel_edit_sheet.dart';
 
 class ProfilBengkelScreen extends StatelessWidget {
@@ -118,7 +119,7 @@ class ProfilBengkelScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () => BengkelEditSheet.show(context, p),
                     icon: const Icon(Icons.edit_outlined, size: 18),
-                    label: const Text('Edit Profil'),
+                    label: const Text('Edit Profil Bengkel'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -232,30 +233,45 @@ class ProfilBengkelScreen extends StatelessWidget {
               ],
             ),
           ),
-          if (user != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: _Info(
-                icon: Icons.person_outline,
-                label: 'Akun Pemilik',
-                nilai: '${user.nama}\n${user.email}',
-              ),
+          const SizedBox(height: 16),
+          const Text('AKUN PEMILIK',
+              style: TextStyle(
+                  fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.muted)),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.border),
             ),
-          ],
+            child: Column(
+              children: [
+                MenuAkunTile(
+                  icon: Icons.person_outline,
+                  judul: user?.nama ?? 'Akun Pemilik',
+                  keterangan: user?.email ?? '',
+                  onTap: () => EditAkunSheet.show(context),
+                ),
+                const Divider(height: 1),
+                MenuAkunTile(
+                  icon: Icons.lock_outline,
+                  judul: 'Ganti Kata Sandi',
+                  keterangan: 'Perbarui keamanan akunmu',
+                  warna: AppColors.orange,
+                  warnaLatar: AppColors.orangeSoft,
+                  onTap: () => GantiSandiSheet.show(context),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 20),
           SizedBox(
             height: 50,
             child: OutlinedButton.icon(
               onPressed: () async {
-                final wpc = context.read<WorkshopProvider>();
+                // Data provider lain dibersihkan otomatis lewat logout listener
                 await context.read<AuthProvider>().logout();
-                wpc.clear();
                 if (context.mounted) context.go('/onboarding');
               },
               icon: const Icon(Icons.logout, size: 18),
